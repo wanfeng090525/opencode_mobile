@@ -68,6 +68,20 @@ android {
             }
         }
     }
+
+    packaging {
+        jniLibs {
+            // AGP 8.x 中 ndk.abiFilters 只约束原生构建产物（cargokit/libapp.so），
+            // 不过滤依赖 AAR 自带的多 ABI jniLibs（如 libdartjni.so、
+            // libdatastore_shared_counter.so）。这里显式剔除非 arm64 目录，
+            // 确保 APK 只含 arm64-v8a。
+            excludes += listOf(
+                "lib/armeabi-v7a/**",
+                "lib/x86/**",
+                "lib/x86_64/**",
+            )
+        }
+    }
 }
 
 flutter {
