@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../utils/translations.dart';
 import '../../../../api/models/message.dart';
+import 'tool_glass_card.dart';
 
 class SkillCard extends StatelessWidget {
   final Part part;
@@ -33,38 +35,40 @@ class SkillCard extends StatelessWidget {
       displayName = 'Skill · ${name.toString().trim()}';
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      child: Row(
+    return ToolGlassCard(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      leading: ToolIconCapsule(
+        icon: isError
+            ? CupertinoIcons.exclamationmark_triangle_fill
+            : CupertinoIcons.sparkles,
+        color: isError ? theme.colorScheme.error : theme.colorScheme.primary,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Flexible(
-            child: Text(
-              displayName,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: isError
-                    ? theme.colorScheme.error.withValues(alpha: 0.7)
-                    : null,
+          Text(
+            displayName,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: isError
+                  ? theme.colorScheme.error.withValues(alpha: 0.7)
+                  : null,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (isError && part.toolError.isNotEmpty)
+            Text(
+              part.toolError,
+              style: TextStyle(
+                fontSize: 11.5,
+                color: theme.colorScheme.error.withValues(alpha: 0.6),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-          ),
-          if (isError && part.toolError.isNotEmpty) ...[
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                part.toolError,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  color: theme.colorScheme.error.withValues(alpha: 0.6),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
         ],
       ),
     );

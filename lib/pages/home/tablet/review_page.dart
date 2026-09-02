@@ -614,7 +614,7 @@ class _ReviewPageState extends State<ReviewPage> {
     final selected = _selectedDiff!;
 
     return Container(
-      color: theme.scaffoldBackgroundColor,
+      color: theme.colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: DiffCodeView(

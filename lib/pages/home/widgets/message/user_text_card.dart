@@ -10,6 +10,23 @@ import '../../../../models/session_runtime_state.dart';
 import '../../../../utils/app_logger.dart';
 import '../../../../utils/app_theme.dart';
 import '../../../../utils/snackbar_utils.dart';
+import '../../../../theme/glass.dart';
+
+/// Liquid-glass tint for the user bubble: accent-tinted translucent fill that
+/// stays readable over the glass background without any backdrop blur.
+Color _bubbleTint(ThemeData theme) {
+  final primary = theme.colorScheme.primary;
+  return theme.brightness == Brightness.dark
+      ? primary.withValues(alpha: 0.30)
+      : primary.withValues(alpha: 0.12);
+}
+
+Color _bubbleBorder(ThemeData theme) {
+  final primary = theme.colorScheme.primary;
+  return theme.brightness == Brightness.dark
+      ? primary.withValues(alpha: 0.45)
+      : Colors.white.withValues(alpha: 0.85);
+}
 
 /// User message text — aligned with desktop UserTextCard:
 /// collapsed uses [Text] with maxLines: 5 + ellipsis (height follows real lines).
@@ -92,75 +109,58 @@ class _UserTextCardState extends State<UserTextCard> {
                 },
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(minWidth: 120),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: PremiumColors.inputBg(theme.brightness),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: PremiumColors.divider(
-                          theme.brightness,
-                        ).withValues(alpha: 0.55),
-                        width: 0.5,
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                            // Desktop uses Text (not SelectableText) so maxLines
-                            // only sizes to real line count — "?" stays one line.
-                            child: Text(
-                              content,
-                              maxLines: _isExpanded ? null : 5,
-                              overflow: _isExpanded
-                                  ? TextOverflow.visible
-                                  : TextOverflow.ellipsis,
-                              style: textStyle,
+                  child: GlassContainer(
+                    radius: 20,
+                    frost: false,
+                    padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+                    tint: _bubbleTint(theme),
+                    borderColor: _bubbleBorder(theme),
+                    child: Stack(
+                      children: [
+                        Text(
+                          content,
+                          maxLines: _isExpanded ? null : 5,
+                          overflow: _isExpanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                          style: textStyle,
+                        ),
+                        if (isLongText && !_isExpanded) ...[
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            height: 48,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    _bubbleTint(theme).withValues(alpha: 0.0),
+                                    _bubbleTint(theme).withValues(alpha: 0.85),
+                                    _bubbleTint(theme),
+                                  ],
+                                  stops: const [0.0, 0.5, 1.0],
+                                ),
+                              ),
                             ),
                           ),
-                          if (isLongText && !_isExpanded) ...[
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              height: 48,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      PremiumColors.inputBg(
-                                        theme.brightness,
-                                      ).withValues(alpha: 0.0),
-                                      PremiumColors.inputBg(
-                                        theme.brightness,
-                                      ).withValues(alpha: 0.85),
-                                      PremiumColors.inputBg(theme.brightness),
-                                    ],
-                                    stops: const [0.0, 0.5, 1.0],
-                                  ),
-                                ),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 2,
+                            child: Center(
+                              child: Icon(
+                                CupertinoIcons.chevron_down,
+                                size: 14,
+                                color: theme.textTheme.bodySmall?.color
+                                    ?.withValues(alpha: 0.45),
                               ),
                             ),
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 2,
-                              child: Center(
-                                child: Icon(
-                                  CupertinoIcons.chevron_down,
-                                  size: 14,
-                                  color: theme.textTheme.bodySmall?.color
-                                      ?.withValues(alpha: 0.45),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ],
-                      ),
+                      ],
                     ),
                   ),
                 ),
@@ -327,7 +327,7 @@ class _UserActionBarState extends State<_UserActionBar> {
         ],
         _ActionIcon(
           icon: _copied ? Icons.check : Icons.copy_outlined,
-          color: _copied ? Colors.green : muted,
+          color: _copied ? const Color(0xFF30D158) : muted,
           onTap: _handleCopy,
         ),
         const SizedBox(width: 4),

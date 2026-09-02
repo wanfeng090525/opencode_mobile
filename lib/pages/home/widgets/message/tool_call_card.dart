@@ -65,15 +65,17 @@ class _ToolCallCardState extends State<ToolCallCard> {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2E1C0F) : const Color(0xFFFFF9E6),
-        borderRadius: BorderRadius.circular(8),
+        color: isDark
+            ? const Color(0xFF2E1C0F).withValues(alpha: 0.9)
+            : const Color(0xFFFFF9E6).withValues(alpha: 0.88),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: currentPerm == 'deny'
               ? Colors.red.withValues(alpha: 0.5)
               : const Color(0xFFE28743).withValues(alpha: isDark ? 0.35 : 0.6),
-          width: 0.5,
+          width: 0.8,
         ),
       ),
       child: Column(
@@ -114,12 +116,12 @@ class _ToolCallCardState extends State<ToolCallCard> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: currentPerm == 'deny'
                       ? Colors.red.withValues(alpha: 0.2)
                       : const Color(0xFFE28743).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
                   currentPerm == 'deny' ? 'DENIED' : 'PENDING',
@@ -146,17 +148,17 @@ class _ToolCallCardState extends State<ToolCallCard> {
             const SizedBox(height: 6),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF1E1F29)
-                    : const Color(0xFFF1F3F5),
-                borderRadius: BorderRadius.circular(6),
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : Colors.white.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: theme.dividerColor.withValues(
-                    alpha: isDark ? 0.15 : 0.3,
-                  ),
-                  width: 0.5,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.12)
+                      : Colors.white.withValues(alpha: 0.9),
+                  width: 0.6,
                 ),
               ),
               child: Text(
@@ -172,7 +174,7 @@ class _ToolCallCardState extends State<ToolCallCard> {
             ),
           ],
           if (currentPerm != 'deny') ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -182,11 +184,14 @@ class _ToolCallCardState extends State<ToolCallCard> {
                     side: BorderSide(
                       color: theme.colorScheme.error.withValues(alpha: 0.5),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 6,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    minimumSize: const Size(64, 28),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 7,
+                    ),
+                    minimumSize: const Size(68, 30),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: Text(
@@ -205,11 +210,14 @@ class _ToolCallCardState extends State<ToolCallCard> {
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 6,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    minimumSize: const Size(72, 28),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 7,
+                    ),
+                    minimumSize: const Size(76, 30),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: const Text(

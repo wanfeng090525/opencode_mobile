@@ -168,9 +168,9 @@ class _TodoList extends StatelessWidget {
                     : CupertinoIcons.circle,
                 size: 13,
                 color: isDone
-                    ? const Color(0xFF4CAF50)
+                    ? const Color(0xFF30D158)
                     : isInProgress
-                    ? const Color(0xFFFF9800)
+                    ? const Color(0xFFFF9F0A)
                     : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.3),
               ),
               const SizedBox(width: 6),
@@ -377,14 +377,17 @@ class PendingPermissionCard extends StatelessWidget {
 
       return Container(
         margin: const EdgeInsets.only(bottom: 4),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2E1C0F) : const Color(0xFFFFF9E6),
-          borderRadius: BorderRadius.circular(12),
+          color: isDark
+              ? const Color(0xFF2E1C0F).withValues(alpha: 0.9)
+              : const Color(0xFFFFF9E6).withValues(alpha: 0.88),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: const Color(
               0xFFE28743,
             ).withValues(alpha: isDark ? 0.35 : 0.6),
+            width: 0.8,
           ),
         ),
         child: Column(
@@ -425,14 +428,14 @@ class PendingPermissionCard extends StatelessWidget {
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
+                  horizontal: 12,
+                  vertical: 9,
                 ),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF1E1F29)
-                      : const Color(0xFFF1F3F5),
-                  borderRadius: BorderRadius.circular(6),
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : Colors.white.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   pending.displayPattern,
@@ -558,14 +561,15 @@ class PendingQuestionCard extends StatelessWidget {
       );
       return Container(
         margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: theme.colorScheme.primary.withValues(
               alpha: isDark ? 0.35 : 0.6,
             ),
+            width: 0.8,
           ),
         ),
         child: QuestionCard(part: part, isInlinePlaceholder: false),
@@ -614,14 +618,15 @@ class PendingPromptBar extends StatelessWidget {
 
       return Container(
         margin: const EdgeInsets.only(bottom: 4),
-        padding: EdgeInsets.symmetric(horizontal: 6),
+        padding: EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: isDark
               ? theme.colorScheme.primary.withValues(alpha: 0.12)
               : theme.colorScheme.primary.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: theme.colorScheme.primary.withValues(alpha: 0.25),
+            width: 0.6,
           ),
         ),
         child: Row(
@@ -682,9 +687,9 @@ class StartExecutionButton extends StatelessWidget {
           );
         },
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          minimumSize: const Size(100, 30),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          minimumSize: const Size(110, 34),
         ),
         child: Text(
           LocaleKeys.makePlan.tr,
@@ -704,9 +709,9 @@ class StartExecutionButton extends StatelessWidget {
           );
         },
         style: FilledButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          minimumSize: const Size(100, 30),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          minimumSize: const Size(110, 34),
         ),
         child: Text(
           LocaleKeys.startExecution.tr,
@@ -753,10 +758,15 @@ class _CollapsiblePanel extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1F29) : const Color(0xFFF6F7F9),
-        borderRadius: BorderRadius.circular(10),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.07)
+            : Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.dividerColor.withValues(alpha: isDark ? 0.15 : 0.3),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.16)
+              : Colors.white.withValues(alpha: 0.9),
+          width: 0.8,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -766,7 +776,7 @@ class _CollapsiblePanel extends StatelessWidget {
           InkWell(
             onTap: onToggle,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
                   Icon(
@@ -785,12 +795,12 @@ class _CollapsiblePanel extends StatelessWidget {
                   const SizedBox(width: 5),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 1,
+                      horizontal: 7,
+                      vertical: 1.5,
                     ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(100),
                     ),
                     child: Text(
                       '$count',
@@ -813,7 +823,7 @@ class _CollapsiblePanel extends StatelessWidget {
           ),
           if (expanded)
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 140),
                 child: SingleChildScrollView(

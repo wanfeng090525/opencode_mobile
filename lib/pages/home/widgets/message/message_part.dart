@@ -125,17 +125,22 @@ class MessagePartWidget extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.orange.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+              color: Colors.orange.withValues(
+                alpha: theme.brightness == Brightness.dark ? 0.14 : 0.10,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.orange.withValues(alpha: 0.25),
+                width: 0.6,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(Icons.refresh, size: 12, color: Colors.orange),
-                const SizedBox(width: 4),
+                const SizedBox(width: 5),
                 Text(
                   'Retry attempt ${part.retryAttempt}',
                   style: TextStyle(
@@ -320,23 +325,39 @@ class _FileAttachmentState extends State<_FileAttachment> {
               widget.part.raw['path']?.toString() ??
               'File');
 
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(top: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.3)),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.white.withValues(alpha: 0.66),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.16)
+              : Colors.white.withValues(alpha: 0.9),
+          width: 0.6,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(CupertinoIcons.paperclip, size: 14),
-          const SizedBox(width: 4),
+          Icon(
+            CupertinoIcons.doc_fill,
+            size: 14,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: 6),
           Flexible(
             child: Text(
               fileName,
-              style: const TextStyle(fontSize: 11),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: theme.textTheme.bodySmall?.color,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -410,14 +431,16 @@ class _ImageAttachmentThumbnail extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(top: 4),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: theme.dividerColor.withValues(alpha: 0.3),
-            width: 0.5,
+            color: theme.brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: 0.18)
+                : Colors.white.withValues(alpha: 0.9),
+            width: 0.6,
           ),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(7.5),
+          borderRadius: BorderRadius.circular(13.4),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 220, maxHeight: 220),
             // 缩略图无需全分辨率解码（点击预览另有全尺寸入口），

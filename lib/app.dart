@@ -5,6 +5,7 @@ import 'api/opencode_client.dart';
 import 'bindings.dart';
 import 'init.dart';
 import 'routes.dart';
+import 'theme/glass.dart';
 import 'utils/app_logger.dart';
 import 'utils/app_theme.dart';
 import 'utils/snackbar_utils.dart';
@@ -61,6 +62,9 @@ class _OpenCodeAppState extends State<OpenCodeApp> {
       initialRoute: AppRoutes.splash,
       getPages: AppRoutes.pages,
       initialBinding: GlobalBinding(),
+      // Liquid-glass ambient backdrop shared by every route, drawer and
+      // dialog: translucent surfaces always have colorful content to frost.
+      builder: (context, child) => GlassBackground(child: child),
       theme: light,
       darkTheme: dark,
       themeMode: isLight ? ThemeMode.light : ThemeMode.dark,

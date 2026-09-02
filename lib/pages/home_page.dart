@@ -1,10 +1,14 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../controllers/project_controller.dart';
 import '../controllers/session_controller.dart';
 import '../controllers/tablet_tool_controller.dart';
+import '../utils/app_theme.dart';
 import '../utils/layout_utils.dart';
+import '../theme/glass.dart';
 import 'home/widgets/phone_brower.dart';
 import 'left_drawer.dart';
 import 'left_drawer/left_panel_content.dart';
@@ -393,10 +397,20 @@ class _HomePageState extends State<HomePage> {
     bool isTablet = false,
   }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return AppBar(
-      toolbarHeight: isTablet ? 40.0 : kToolbarHeight,
+      toolbarHeight: isTablet ? 44.0 : kToolbarHeight,
       centerTitle: true,
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      // Liquid-glass frosted backdrop behind the whole toolbar + status bar.
+      flexibleSpace: SafeArea(
+        bottom: false,
+        child: _GlassAppBarBackdrop(isDark: isDark),
+      ),
       title: opened.isNotEmpty
           ? SessionIndicator(
               openedIds: opened,
@@ -409,30 +423,39 @@ class _HomePageState extends State<HomePage> {
         if (showToolPanelToggle)
           Obx(() {
             final toolCtrl = Get.find<TabletToolController>();
-            return IconButton(
+            return GlassIconButton(
               icon: Icon(
                 toolCtrl.isVisible.value
                     ? Icons.view_sidebar
                     : Icons.view_sidebar_outlined,
-                color: toolCtrl.isVisible.value
-                    ? theme.colorScheme.primary
-                    : null,
               ),
+              size: 34,
+              iconSize: 18,
+              color: toolCtrl.isVisible.value
+                  ? theme.colorScheme.primary
+                  : (isDark ? const Color(0xFFEBEBF5) : const Color(0xFF1C1C1E)),
               tooltip: LocaleKeys.tabletToggleToolPanel.tr,
               onPressed: () => toolCtrl.togglePanel(),
             );
           }),
         if (showEndDrawer)
           Builder(
-            builder: (ctx) => IconButton(
-              icon: const Icon(Icons.tune_outlined),
-              onPressed: () => Scaffold.of(ctx).openEndDrawer(),
+            builder: (ctx) => Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: GlassIconButton(
+                icon: const Icon(Icons.tune_rounded),
+                size: 34,
+                iconSize: 18,
+                tooltip: LocaleKeys.tabletToggleToolPanel.tr,
+                onPressed: () => Scaffold.of(ctx).openEndDrawer(),
+              ),
             ),
           ),
+        const SizedBox(width: 4),
       ],
       bottom: opened.isNotEmpty
           ? PreferredSize(
-              preferredSize: const Size.fromHeight(28),
+              preferredSize: const Size.fromHeight(30),
               child: Obx(() {
                 final tokens = sessionCtrl.activeSessionMessageTokens(
                   sessionId,
@@ -444,25 +467,23 @@ class _HomePageState extends State<HomePage> {
                     : 0.0;
 
                 final barColor = ratio >= 0.9
-                    ? Colors.red
+                    ? PremiumColors.error
                     : ratio >= 0.75
-                    ? Colors.orange
-                    : theme.colorScheme.primary;
+                        ? PremiumColors.warning
+                        : theme.colorScheme.primary;
 
                 return Container(
                   width: double.infinity,
-                  height: 28,
+                  height: 30,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(
-                      alpha: 0.2,
-                    ),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.04)
+                        : Colors.white.withValues(alpha: 0.35),
                     border: Border(
                       top: BorderSide(
-                        color: theme.colorScheme.outline.withValues(alpha: 0.1),
-                        width: 0.5,
-                      ),
-                      bottom: BorderSide(
-                        color: theme.colorScheme.outline.withValues(alpha: 0.1),
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.white.withValues(alpha: 0.6),
                         width: 0.5,
                       ),
                     ),
@@ -479,6 +500,7 @@ class _HomePageState extends State<HomePage> {
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w600,
+                                letterSpacing: -0.2,
                                 color: theme.colorScheme.onSurface,
                               ),
                               maxLines: 1,
@@ -488,19 +510,29 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      // Context Token Usage Progress Bar (Bottom Divider Line)
+                      // Context Token Usage Progress Line
                       if (hasLimit)
                         Positioned(
                           left: 0,
                           right: 0,
                           bottom: 0,
-                          height: 1.5,
+                          height: 2,
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: FractionallySizedBox(
                               widthFactor: ratio,
-                              child: Container(
-                                color: barColor.withValues(alpha: 0.85),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      barColor.withValues(alpha: 0.55),
+                                      barColor,
+                                    ],
+                                  ),
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(2),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -511,6 +543,52 @@ class _HomePageState extends State<HomePage> {
               }),
             )
           : null,
+    );
+  }
+}
+
+/// Frosted backdrop for the app bar: blur + translucent tint + bottom
+/// hairline, mimicking the iOS 26 navigation chrome.
+class _GlassAppBarBackdrop extends StatelessWidget {
+  const _GlassAppBarBackdrop({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        BackdropFilter(
+          filter: ui.ImageFilter.blur(
+            sigmaX: GlassTokens.blurMedium,
+            sigmaY: GlassTokens.blurMedium,
+            tileMode: TileMode.mirror,
+          ),
+          child: ColoredBox(
+            color: isDark
+                ? const Color(0x59101320)
+                : Colors.white.withValues(alpha: 0.55),
+          ),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? [
+                      Colors.white.withValues(alpha: 0.07),
+                      Colors.white.withValues(alpha: 0.02),
+                    ]
+                  : [
+                      Colors.white.withValues(alpha: 0.5),
+                      Colors.white.withValues(alpha: 0.15),
+                    ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

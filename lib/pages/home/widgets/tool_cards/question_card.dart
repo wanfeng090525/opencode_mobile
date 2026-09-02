@@ -780,34 +780,27 @@ class _QuestionCardState extends State<QuestionCard> {
                 onTap: (isPending && !_submitting)
                     ? () => _handleSelection(index, opt.label, q)
                     : null,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(14),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
+                    horizontal: 14,
+                    vertical: 11,
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? theme.colorScheme.primary.withValues(alpha: 0.05)
+                        ? theme.colorScheme.primary.withValues(alpha: 0.10)
                         : (theme.brightness == Brightness.dark
-                              ? Colors.white.withValues(alpha: 0.02)
-                              : Colors.white),
-                    borderRadius: BorderRadius.circular(10),
+                              ? Colors.white.withValues(alpha: 0.06)
+                              : Colors.white.withValues(alpha: 0.68)),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isSelected
-                          ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                          : theme.dividerColor.withValues(alpha: 0.15),
+                          ? theme.colorScheme.primary.withValues(alpha: 0.45)
+                          : (theme.brightness == Brightness.dark
+                                ? Colors.white.withValues(alpha: 0.14)
+                                : Colors.white.withValues(alpha: 0.9)),
                       width: isSelected ? 1.2 : 0.8,
                     ),
-                    boxShadow: isSelected
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.015),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
                   ),
                   child: Row(
                     children: [
@@ -1120,14 +1113,16 @@ class _QuestionCardState extends State<QuestionCard> {
             Container(
               width: double.infinity,
               margin: const EdgeInsets.only(top: 4, bottom: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: theme.brightness == Brightness.dark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.black.withValues(alpha: 0.03),
-                borderRadius: BorderRadius.circular(8),
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : Colors.white.withValues(alpha: 0.66),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: theme.dividerColor.withValues(alpha: 0.2),
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: 0.14)
+                      : Colors.white.withValues(alpha: 0.9),
                   width: 0.8,
                 ),
               ),
@@ -1163,15 +1158,17 @@ class _QuestionCardState extends State<QuestionCard> {
             if (i > 0) const SizedBox(height: 8),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.03)
-                    : Colors.black.withValues(alpha: 0.02),
-                borderRadius: BorderRadius.circular(6),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.white.withValues(alpha: 0.62),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: theme.dividerColor.withValues(alpha: 0.15),
-                  width: 0.5,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.12)
+                      : Colors.white.withValues(alpha: 0.85),
+                  width: 0.6,
                 ),
               ),
               child: Row(
@@ -1191,12 +1188,12 @@ class _QuestionCardState extends State<QuestionCard> {
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
+                      horizontal: 8,
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.error.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(100),
                     ),
                     child: Text(
                       'Skip',

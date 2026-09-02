@@ -6,6 +6,7 @@ import '../../../../utils/translations.dart';
 import '../../../../api/models/message.dart';
 import '../../../../utils/app_theme.dart';
 import '../../../../widgets/detail_bottom_sheet.dart';
+import 'tool_glass_card.dart';
 import '../../tablet/diff_code_view.dart';
 import '../../tablet/diff_view.dart';
 
@@ -121,99 +122,82 @@ class _BatchCardState extends State<BatchCard> {
         ? files.first.displayPath
         : '${files.length} files';
 
-    return Container(
-      margin: const EdgeInsets.only(left: 0, right: 0, top: 2, bottom: 2),
-      decoration: BoxDecoration(
-        color: appColors.toolCardBg,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: theme.dividerColor.withValues(alpha: 0.2),
-          width: 0.5,
-        ),
+    return ToolGlassCard(
+      onTap: canExpand ? _openSheet : null,
+      leading: ToolIconCapsule(
+        icon: isError
+            ? CupertinoIcons.exclamationmark_triangle_fill
+            : CupertinoIcons.square_stack_3d_up_fill,
+        color: isError ? theme.colorScheme.error : theme.colorScheme.primary,
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: canExpand ? _openSheet : null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 44,
-                  child: Text(
-                    'Batch',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: isError
-                          ? theme.colorScheme.error.withValues(alpha: 0.7)
-                          : theme.textTheme.bodySmall?.color?.withValues(
-                              alpha: 0.6,
-                            ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    headerPath.isNotEmpty ? headerPath : '...',
-                    style: headerPath.isNotEmpty
-                        ? TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 13,
-                            color: theme.textTheme.bodySmall?.color,
-                          )
-                        : theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 13,
-                            color: theme.hintColor,
-                          ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (addedLines > 0 || removedLines > 0) ...[
-                  const SizedBox(width: 8),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '+$addedLines',
-                          style: TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 11.5,
-                            color: appColors.success,
-                          ),
-                        ),
-                        const TextSpan(text: ' '),
-                        TextSpan(
-                          text: '-$removedLines',
-                          style: TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 11.5,
-                            color: theme.colorScheme.error,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                if (canExpand) ...[
-                  const SizedBox(width: 6),
-                  Icon(
-                    CupertinoIcons.chevron_right,
-                    size: 12,
-                    color: theme.textTheme.bodySmall?.color?.withValues(
-                      alpha: 0.35,
-                    ),
-                  ),
-                ],
-              ],
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Batch',
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isError
+                  ? theme.colorScheme.error.withValues(alpha: 0.7)
+                  : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
             ),
           ),
-        ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              headerPath.isNotEmpty ? headerPath : '...',
+              style: headerPath.isNotEmpty
+                  ? TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                      color: theme.textTheme.bodySmall?.color,
+                    )
+                  : theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 13,
+                      color: theme.hintColor,
+                    ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if (addedLines > 0 || removedLines > 0) ...[
+            const SizedBox(width: 8),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '+$addedLines',
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: appColors.success,
+                    ),
+                  ),
+                  const TextSpan(text: ' '),
+                  TextSpan(
+                    text: '-$removedLines',
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
+      trailing: canExpand
+          ? Icon(
+              CupertinoIcons.chevron_right,
+              size: 12,
+              color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.35),
+            )
+          : null,
     );
   }
 

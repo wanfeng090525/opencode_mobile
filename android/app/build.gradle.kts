@@ -46,6 +46,12 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // 仅保留 64 位 ARM 构建目标：现代 Android 手机/平板均使用 arm64-v8a，
+        // 剔除 armeabi-v7a/x86/x86_64 显著缩小 APK/AAB 体积并加快构建。
+        ndk {
+            abiFilters += listOf("arm64-v8a")
+        }
     }
 
     buildTypes {

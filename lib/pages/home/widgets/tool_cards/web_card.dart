@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../utils/translations.dart';
 import '../../../../api/models/message.dart';
 import '../../tablet/in_app_browser_view.dart';
+import 'tool_glass_card.dart';
 
 class WebCard extends StatelessWidget {
   final Part part;
@@ -24,43 +26,31 @@ class WebCard extends StatelessWidget {
         ? '${label.substring(0, 60)}...'
         : label;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      child: Row(
-        children: [
-          Text(
-            isSearch ? LocaleKeys.cardVisSearch.tr : LocaleKeys.cardVisWeb.tr,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: isError
-                  ? theme.colorScheme.error.withValues(alpha: 0.7)
-                  : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: GestureDetector(
-              onTap: !isSearch && url.isNotEmpty
-                  ? () => openUrlInApp(context, url)
-                  : null,
-              child: Text(
-                shortLabel,
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 13,
-                  color: !isSearch && url.isNotEmpty
-                      ? theme.colorScheme.primary
-                      : theme.textTheme.bodySmall?.color?.withValues(
-                          alpha: 0.7,
-                        ),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-        ],
+    final canOpen = !isSearch && url.isNotEmpty;
+
+    return ToolGlassCard(
+      onTap: canOpen ? () => openUrlInApp(context, url) : null,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      leading: ToolIconCapsule(
+        icon: isSearch
+            ? CupertinoIcons.search
+            : CupertinoIcons.globe,
+        color: isError
+            ? theme.colorScheme.error
+            : theme.colorScheme.primary,
+      ),
+      child: Text(
+        shortLabel,
+        style: TextStyle(
+          fontFamily: 'monospace',
+          fontSize: 13,
+          fontWeight: canOpen ? FontWeight.w600 : FontWeight.w500,
+          color: canOpen
+              ? theme.colorScheme.primary
+              : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

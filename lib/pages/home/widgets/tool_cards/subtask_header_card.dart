@@ -10,15 +10,20 @@ class SubtaskHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final secondary = theme.colorScheme.secondary;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: theme.colorScheme.secondary.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(8),
+          color: secondary.withValues(alpha: isDark ? 0.12 : 0.10),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: theme.colorScheme.secondary.withValues(alpha: 0.15),
+            color: isDark
+                ? secondary.withValues(alpha: 0.30)
+                : Colors.white.withValues(alpha: 0.85),
+            width: 0.8,
           ),
         ),
         child: Column(
@@ -27,9 +32,9 @@ class SubtaskHeaderCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  CupertinoIcons.flowchart,
+                  CupertinoIcons.flowchart_fill,
                   size: 13,
-                  color: theme.colorScheme.secondary,
+                  color: secondary,
                 ),
                 const SizedBox(width: 6),
                 Expanded(

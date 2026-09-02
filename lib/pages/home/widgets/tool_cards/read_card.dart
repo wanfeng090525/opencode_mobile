@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../api/models/message.dart';
@@ -6,6 +7,7 @@ import '../../../../controllers/tablet_tool_controller.dart';
 import '../../../../routes.dart';
 import '../../../../utils/layout_utils.dart';
 import '../../../../utils/translations.dart';
+import 'tool_glass_card.dart';
 
 /// 行号前缀（`123:`）匹配模式。E2：提为顶层 final，避免每次 build 新建。
 final RegExp _lineNumRe = RegExp(r'^\s*(\d+):[ \t]', multiLine: true);
@@ -131,77 +133,54 @@ class ReadCard extends StatelessWidget {
     final isError = status == ToolStateStatus.error;
     final canOpen = filePath.isNotEmpty;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-      child: Row(
+    return ToolGlassCard(
+      onTap: canOpen ? () => _openFile(context, filePath, shortFileName) : null,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      leading: ToolIconCapsule(
+        icon: isError
+            ? CupertinoIcons.exclamationmark_triangle_fill
+            : CupertinoIcons.doc_text,
+        color: isError ? theme.colorScheme.error : theme.colorScheme.primary,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 38,
-            child: Text(
-              LocaleKeys.cardVisRead.tr,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: isError
-                    ? theme.colorScheme.error.withValues(alpha: 0.7)
-                    : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-              ),
-            ),
-          ),
-          const SizedBox(width: 6),
           if (filePath.isNotEmpty)
-            Flexible(
-              child: Tooltip(
-                message: filePath + (rangeText.isNotEmpty ? rangeText : ''),
-                waitDuration: const Duration(milliseconds: 500),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: canOpen
-                        ? () => _openFile(context, filePath, shortFileName)
-                        : null,
-                    borderRadius: BorderRadius.circular(4),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 3,
-                        vertical: 1.5,
-                      ),
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: fileName.isNotEmpty ? fileName : filePath,
-                              style: TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: isError
-                                    ? theme.colorScheme.error.withValues(
-                                        alpha: 0.7,
-                                      )
-                                    : (theme.textTheme.bodySmall?.color ??
-                                          theme.colorScheme.primary),
-                              ),
-                            ),
-                            if (rangeText.isNotEmpty)
-                              TextSpan(
-                                text: rangeText,
-                                style: TextStyle(
-                                  fontFamily: 'monospace',
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.normal,
-                                  color: theme.textTheme.bodySmall?.color
-                                      ?.withValues(alpha: 0.45),
-                                ),
-                              ),
-                          ],
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+            Tooltip(
+              message: filePath + (rangeText.isNotEmpty ? rangeText : ''),
+              waitDuration: const Duration(milliseconds: 500),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: fileName.isNotEmpty ? fileName : filePath,
+                      style: TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isError
+                            ? theme.colorScheme.error.withValues(alpha: 0.7)
+                            : (theme.textTheme.bodySmall?.color ??
+                                  theme.colorScheme.primary),
                       ),
                     ),
-                  ),
+                    if (rangeText.isNotEmpty)
+                      TextSpan(
+                        text: rangeText,
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.normal,
+                          color: theme.textTheme.bodySmall?.color?.withValues(
+                            alpha: 0.45,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             )
           else
@@ -212,20 +191,16 @@ class ReadCard extends StatelessWidget {
                 color: theme.hintColor,
               ),
             ),
-          if (isError && part.toolError.isNotEmpty) ...[
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                part.toolError,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  color: theme.colorScheme.error.withValues(alpha: 0.6),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+          if (isError && part.toolError.isNotEmpty)
+            Text(
+              part.toolError,
+              style: TextStyle(
+                fontSize: 11.5,
+                color: theme.colorScheme.error.withValues(alpha: 0.6),
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
         ],
       ),
     );

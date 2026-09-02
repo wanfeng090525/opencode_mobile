@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../theme/glass.dart';
 
-/// Opens a scrollable detail sheet. [bodyBuilder] runs only when the sheet
-/// is shown, so heavy content stays off the chat main tree.
+/// Opens a scrollable liquid-glass detail sheet. [bodyBuilder] runs only when
+/// the sheet is shown, so heavy content stays off the chat main tree.
 Future<T?> showDetailBottomSheet<T>({
   required BuildContext context,
   required String title,
@@ -9,10 +10,9 @@ Future<T?> showDetailBottomSheet<T>({
   double heightFactor = 0.75,
 }) {
   final maxHeight = MediaQuery.sizeOf(context).height * heightFactor;
-  return showModalBottomSheet<T>(
+  return showGlassBottomSheet<T>(
     context: context,
     isScrollControlled: true,
-    showDragHandle: true,
     builder: (ctx) {
       final theme = Theme.of(ctx);
       return SafeArea(
@@ -21,11 +21,24 @@ Future<T?> showDetailBottomSheet<T>({
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Center(child: const GlassDragHandle()),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: Text(title, style: theme.textTheme.titleMedium),
+                padding: const EdgeInsets.fromLTRB(24, 6, 24, 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontSize: 17,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const Divider(height: 1),
               Expanded(child: bodyBuilder(ctx)),
             ],
           ),

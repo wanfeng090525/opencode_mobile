@@ -6,6 +6,7 @@ import '../../../../api/models/message.dart';
 import '../../../../utils/app_theme.dart';
 import '../../../../widgets/detail_bottom_sheet.dart';
 import '../../../../controllers/session_controller.dart';
+import 'tool_glass_card.dart';
 
 /// ANSI 转义清洗用的三个模式。E2：提为顶层 final，避免每次调用新建
 /// RegExp（stripAnsi 在流式期间对全量输出反复执行）。
@@ -65,55 +66,42 @@ class BashCard extends StatelessWidget {
     final hasContent =
         output.isNotEmpty || error.isNotEmpty || command.isNotEmpty;
 
-    return Container(
-      margin: const EdgeInsets.only(top: 2, bottom: 2),
-      decoration: BoxDecoration(
-        color: appColors.toolCardBg,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: theme.dividerColor.withValues(alpha: 0.2),
-          width: 0.5,
-        ),
+    return ToolGlassCard(
+      onTap: (hasContent || isRunning) ? () => _openSheet(context) : null,
+      leading: ToolIconCapsule(
+        icon: CupertinoIcons.command,
+        color: appColors.bashAccent,
       ),
-      child: InkWell(
-        onTap: (hasContent || isRunning) ? () => _openSheet(context) : null,
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  (description?.isNotEmpty == true) ? description! : command,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: appColors.bashAccent,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+      child: Text(
+        (description?.isNotEmpty == true) ? description! : command,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: appColors.bashAccent,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      // 转圈只在该 tool 真正随会话流式生成时显示；历史/静止中的
+      // running/pending（如中断未收尾的旧记录）不再假转圈。
+      trailing: (isRunning && isStreaming)
+          ? SizedBox(
+              width: 12,
+              height: 12,
+              child: CircularProgressIndicator(
+                strokeWidth: 1.4,
+                color: appColors.bashAccent,
               ),
-              // 转圈只在该 tool 真正随会话流式生成时显示；历史/静止中的
-              // running/pending（如中断未收尾的旧记录）不再假转圈。
-              if (isRunning && isStreaming)
-                const SizedBox(
-                  width: 12,
-                  height: 12,
-                  child: CircularProgressIndicator(strokeWidth: 1.2),
-                )
-              else if (hasContent)
-                Icon(
-                  CupertinoIcons.chevron_right,
-                  size: 12,
-                  color: theme.textTheme.bodySmall?.color?.withValues(
-                    alpha: 0.35,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
+            )
+          : (hasContent
+                ? Icon(
+                    CupertinoIcons.chevron_right,
+                    size: 12,
+                    color: theme.textTheme.bodySmall?.color?.withValues(
+                      alpha: 0.35,
+                    ),
+                  )
+                : null),
     );
   }
 }

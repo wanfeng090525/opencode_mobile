@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 // import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +16,7 @@ import '../../init.dart';
 import '../../models/model_info.dart';
 import '../../models/session_runtime_state.dart';
 import '../../routes.dart';
+import '../../theme/glass.dart';
 import '../../utils/app_theme.dart';
 // import '../../utils/app_logger.dart';
 import '../../utils/snackbar_utils.dart';
@@ -279,10 +281,9 @@ class _PromptInputState extends State<PromptInput> with WidgetsBindingObserver {
       final inputEnabled = hasSession && !hasPendingPermission;
 
       final isDark = theme.brightness == Brightness.dark;
-      final bg = context.appColors.inputBg;
 
       return Padding(
-        padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+        padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -296,7 +297,7 @@ class _PromptInputState extends State<PromptInput> with WidgetsBindingObserver {
                 return const SizedBox.shrink();
               }
               return Padding(
-                padding: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.only(bottom: 6),
                 child: _AttachmentsBar(
                   files: files.toList(),
                   images: images.toList(),
@@ -341,25 +342,12 @@ class _PromptInputState extends State<PromptInput> with WidgetsBindingObserver {
                 ),
               ],
             ),
-            Container(
-              decoration: BoxDecoration(
-                color: bg,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: theme.colorScheme.outline.withValues(
-                    alpha: isDark ? 0.2 : 0.12,
-                  ),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
+            // Liquid-glass input dock: frosted, floating, softly lit edges.
+            GlassContainer(
+              radius: 26,
+              blur: GlassTokens.blurMedium,
+              padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
+              shadows: GlassTokens.shadowOf(theme.brightness),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -370,6 +358,7 @@ class _PromptInputState extends State<PromptInput> with WidgetsBindingObserver {
                     minLines: 1,
                     enabled: inputEnabled,
                     textInputAction: TextInputAction.newline,
+                    cursorColor: theme.colorScheme.primary,
                     decoration: InputDecoration(
                       hintText: !hasSession
                           ? 'Select a session'
@@ -378,14 +367,19 @@ class _PromptInputState extends State<PromptInput> with WidgetsBindingObserver {
                           : isWorking
                           ? 'Generating...'
                           : 'Type a message...',
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: 14,
+                        color: theme.colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.7),
+                      ),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
                       filled: false,
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 8,
+                        horizontal: 12,
+                        vertical: 10,
                       ),
                       isDense: true,
                     ),
@@ -570,6 +564,7 @@ class _SendStopButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isStopping = isGenerating && !canSend;
     final isSendActive = enabled && canSend;
 
@@ -588,10 +583,10 @@ class _SendStopButton extends StatelessWidget {
     } else {
       bgColor = isSendActive
           ? theme.colorScheme.primary
-          : theme.colorScheme.onSurface.withValues(alpha: 0.08);
+          : (isDark ? Colors.white24 : Colors.black12);
       iconColor = isSendActive
           ? theme.colorScheme.onPrimary
-          : theme.colorScheme.onSurface.withValues(alpha: 0.3);
+          : theme.colorScheme.onSurface.withValues(alpha: 0.35);
       iconData = Icons.arrow_upward_rounded;
       tooltip = LocaleKeys.mobileSendEnter.tr;
       onTap = isSendActive ? onSend : null;
@@ -603,19 +598,42 @@ class _SendStopButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
+            curve: Curves.easeOutCubic,
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              gradient: onTap != null
+                  ? LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color.lerp(bgColor, Colors.white, 0.22)!,
+                        bgColor,
+                      ],
+                    )
+                  : null,
+              color: onTap != null ? null : bgColor,
+              shape: BoxShape.circle,
+              boxShadow: onTap != null
+                  ? [
+                      BoxShadow(
+                        color: bgColor.withValues(alpha: isDark ? 0.5 : 0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                        spreadRadius: -3,
+                      ),
+                    ]
+                  : null,
+            ),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
               child: Icon(
                 iconData,
                 key: ValueKey(iconData),
-                size: 17,
+                size: 19,
                 color: iconColor,
               ),
             ),
@@ -651,9 +669,8 @@ class _UtilityBar extends StatelessWidget {
     if (settings.commands.isEmpty && !settings.isLoadingCommands.value) {
       settings.fetchCommands();
     }
-    showModalBottomSheet(
+    showGlassBottomSheet(
       context: context,
-      showDragHandle: true,
       isScrollControlled: true,
       builder: (ctx) {
         return Obx(() {
@@ -665,7 +682,9 @@ class _UtilityBar extends StatelessWidget {
             return SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text(LocaleKeys.mobileNoQuickPhrasesHint.tr),
+                child: Center(
+                  child: Text(LocaleKeys.mobileNoQuickPhrasesHint.tr),
+                ),
               ),
             );
           }
@@ -676,12 +695,12 @@ class _UtilityBar extends StatelessWidget {
                 maxHeight: MediaQuery.of(ctx).size.height * 0.5,
               ),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
                 child: SizedBox(
                   width: double.infinity,
                   child: Wrap(
                     spacing: 8,
-                    runSpacing: 6,
+                    runSpacing: 8,
                     children: all.map((p) {
                       final theme = Theme.of(ctx);
                       return ActionChip(
@@ -696,6 +715,7 @@ class _UtilityBar extends StatelessWidget {
                           p.name.isNotEmpty ? p.name : p.template,
                           style: TextStyle(
                             fontSize: 12,
+                            fontWeight: FontWeight.w600,
                             color: p.isSystem
                                 ? theme.colorScheme.primary
                                 : theme.colorScheme.onSurface,
@@ -724,9 +744,8 @@ class _UtilityBar extends StatelessWidget {
   }
 
   void _showVcsBranchSheet(BuildContext context) {
-    showModalBottomSheet<void>(
+    showGlassBottomSheet<void>(
       context: context,
-      showDragHandle: true,
       isScrollControlled: true,
       builder: (_) => const VcsBranchSheet(),
     );
@@ -734,11 +753,10 @@ class _UtilityBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final sessionCtrl = Get.find<SessionController>();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+      padding: const EdgeInsets.fromLTRB(6, 2, 6, 4),
       child: Row(
         children: [
           Expanded(
@@ -750,19 +768,34 @@ class _UtilityBar extends StatelessWidget {
                   // 1. 手动压缩
                   IconButton(
                     tooltip: LocaleKeys.chatManualCompact.tr,
-                    icon: const Icon(Icons.compress_outlined, size: 20),
+                    style: IconButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.compress_rounded, size: 21),
                     onPressed: () => sessionCtrl.compactActiveSession(),
                   ),
                   // 2. 快捷短语
                   IconButton(
                     tooltip: LocaleKeys.csQuickPhrases.tr,
-                    icon: const Icon(Icons.quickreply_outlined, size: 20),
+                    style: IconButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.quickreply_rounded, size: 21),
                     onPressed: () => _showQuickPhrases(context),
                   ),
                   // 3. 终端
                   IconButton(
                     tooltip: LocaleKeys.mobileRemoteTerminal.tr,
-                    icon: const Icon(Icons.terminal, size: 20),
+                    style: IconButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.terminal_rounded, size: 21),
                     onPressed: () {
                       if (_isTabletMode(context)) {
                         Get.find<TabletToolController>().focusTerminal();
@@ -774,7 +807,12 @@ class _UtilityBar extends StatelessWidget {
                   // 4. 预览
                   IconButton(
                     tooltip: LocaleKeys.tabletWebTab.tr,
-                    icon: const Icon(CupertinoIcons.eye, size: 20),
+                    style: IconButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(CupertinoIcons.eye, size: 21),
                     onPressed: () => _openPreview(context),
                     onLongPress: () => _showBindPortDialog(context),
                   ),
@@ -797,22 +835,36 @@ class _UtilityBar extends StatelessWidget {
                       children: [
                         IconButton(
                           tooltip: tooltip,
+                          style: IconButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           icon: const Icon(
                             CupertinoIcons.arrow_branch,
-                            size: 20,
+                            size: 21,
                           ),
                           onPressed: () => _showVcsBranchSheet(context),
                         ),
                         if (hasChanges)
                           Positioned(
-                            right: 8,
-                            top: 8,
+                            right: 9,
+                            top: 9,
                             child: Container(
                               width: 7,
                               height: 7,
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.primary,
+                                color: PremiumColors.primary,
                                 shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: PremiumColors.primary.withValues(
+                                      alpha: 0.5,
+                                    ),
+                                    blurRadius: 5,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -832,14 +884,27 @@ class _UtilityBar extends StatelessWidget {
                       width: 24,
                       height: 24,
                       child: Center(
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOutCubic,
                           width: 12,
                           height: 12,
                           decoration: BoxDecoration(
                             color: showAlert
-                                ? Colors.redAccent
+                                ? PremiumColors.error
                                 : Colors.transparent,
                             shape: BoxShape.circle,
+                            boxShadow: showAlert
+                                ? [
+                                    BoxShadow(
+                                      color: PremiumColors.error.withValues(
+                                        alpha: 0.55,
+                                      ),
+                                      blurRadius: 8,
+                                      spreadRadius: 2,
+                                    ),
+                                  ]
+                                : null,
                           ),
                         ),
                       ),
@@ -852,7 +917,12 @@ class _UtilityBar extends StatelessWidget {
           // 6. 新建session（靠右对齐）
           IconButton(
             tooltip: LocaleKeys.cmdNewSession.tr,
-            icon: const Icon(CupertinoIcons.square_pencil, size: 20),
+            style: IconButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: const Icon(CupertinoIcons.square_pencil, size: 21),
             onPressed: () => sessionCtrl.createNewSession(),
           ),
         ],
@@ -1186,6 +1256,7 @@ class _AgentSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = theme.brightness == Brightness.dark;
     return InkWell(
       onTap: () {
         final other = agents.firstWhere(
@@ -1194,24 +1265,28 @@ class _AgentSelector extends StatelessWidget {
         );
         onSelect(other);
       },
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
+      borderRadius: BorderRadius.circular(GlassTokens.radiusChip),
+      child: GlassContainer(
+        radius: GlassTokens.radiusChip,
+        frost: false,
         height: 28,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        tint: selected == 'build'
+            ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.30 : 0.14)
+            : (isDark
+                ? Colors.white.withValues(alpha: 0.10)
+                : Colors.white.withValues(alpha: 0.65)),
         alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          color: selected == 'build'
-              ? theme.colorScheme.primary.withValues(alpha: 0.15)
-              : context.appColors.chipBg,
-          borderRadius: BorderRadius.circular(6),
-        ),
         child: Text(
           _labelFor(selected),
           style: theme.textTheme.bodySmall?.copyWith(
             fontSize: 11,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             height: 1.0,
-            color: selected == 'build' ? theme.colorScheme.primary : null,
+            letterSpacing: -0.2,
+            color: selected == 'build'
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurface,
           ),
         ),
       ),
@@ -1236,24 +1311,28 @@ class _SelectorChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = theme.brightness == Brightness.dark;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
+      borderRadius: BorderRadius.circular(GlassTokens.radiusChip),
+      child: GlassContainer(
+        radius: GlassTokens.radiusChip,
+        frost: false,
         height: 28,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        tint: isDark
+            ? Colors.white.withValues(alpha: 0.10)
+            : Colors.white.withValues(alpha: 0.65),
         alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6),
-          color: context.appColors.chipBg,
-        ),
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
           child: Text(
             label,
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 11,
+              fontWeight: FontWeight.w600,
               height: 1.0,
+              letterSpacing: -0.2,
             ),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
@@ -1293,21 +1372,20 @@ class _AttachmentsBar extends StatelessWidget {
     if (files.isEmpty && images.isEmpty) return const SizedBox.shrink();
 
     Widget buildDescribeButton() {
+      final isDark = theme.brightness == Brightness.dark;
       return InkWell(
         onTap: describing ? null : onDescribeImages,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
+        borderRadius: BorderRadius.circular(GlassTokens.radiusTile),
+        child: GlassContainer(
+          radius: GlassTokens.radiusTile,
+          frost: false,
           height: 52,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withValues(
-              alpha: 0.6,
-            ),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-              width: 0.5,
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          tint: theme.colorScheme.primary.withValues(
+            alpha: isDark ? 0.22 : 0.10,
+          ),
+          borderColor: theme.colorScheme.primary.withValues(
+            alpha: isDark ? 0.4 : 0.3,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1336,7 +1414,8 @@ class _AttachmentsBar extends StatelessWidget {
                     LocaleKeys.mobileImageToText.tr,
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontSize: 11,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
                       color: theme.colorScheme.primary,
                     ),
                   ),
@@ -1384,26 +1463,24 @@ class _AttachmentsBar extends StatelessWidget {
               final name = path.split('\\').last.split('/').last;
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
-                child: Container(
+                child: GlassContainer(
                   height: 32,
-                  padding: const EdgeInsets.only(left: 8, right: 4),
-                  decoration: BoxDecoration(
-                    color: context.appColors.chipBg,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withValues(
-                        alpha: 0.4,
-                      ),
-                      width: 0.5,
-                    ),
+                  radius: GlassTokens.radiusChip,
+                  frost: false,
+                  padding: const EdgeInsets.only(left: 10, right: 5),
+                  tint: theme.colorScheme.surface.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.16 : 0.55,
+                  ),
+                  borderColor: theme.colorScheme.outlineVariant.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.35 : 0.55,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        CupertinoIcons.paperclip,
+                        CupertinoIcons.doc_fill,
                         size: 13,
-                        color: theme.colorScheme.primary.withValues(alpha: 0.8),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.9),
                       ),
                       const SizedBox(width: 6),
                       ConstrainedBox(
@@ -1412,11 +1489,13 @@ class _AttachmentsBar extends StatelessWidget {
                           name,
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.1,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 5),
                       InkWell(
                         onTap: () => onRemoveFile(path),
                         borderRadius: BorderRadius.circular(10),
@@ -1559,7 +1638,7 @@ class _ImageChipState extends State<_ImageChip> {
         width: 52,
         height: 52,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
             width: 0.5,
@@ -1569,7 +1648,7 @@ class _ImageChipState extends State<_ImageChip> {
           children: [
             Positioned.fill(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(7),
+                borderRadius: BorderRadius.circular(13.5),
                 // 52px 缩略图无需全分辨率解码，限制缓存尺寸降内存。
                 child: Image.memory(
                   widget.bytes,
@@ -1578,25 +1657,68 @@ class _ImageChipState extends State<_ImageChip> {
                 ),
               ),
             ),
+            // 顶部高光渐变，呼应液态玻璃的镜面质感
             Positioned(
-              top: 1,
-              right: 1,
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 18,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(13.5),
+                    ),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.white.withValues(
+                          alpha: theme.brightness == Brightness.dark
+                              ? 0.10
+                              : 0.26,
+                        ),
+                        Colors.white.withValues(alpha: 0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 3,
+              right: 3,
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: widget.onRemove,
                   borderRadius: BorderRadius.circular(9),
-                  child: Container(
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surface.withValues(alpha: 0.8),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.close_rounded,
-                      size: 11,
-                      color: theme.colorScheme.onSurface,
+                  child: ClipOval(
+                    child: BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                      child: Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.black.withValues(alpha: 0.3)
+                              : Colors.white.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(
+                              alpha: theme.brightness == Brightness.dark
+                                  ? 0.25
+                                  : 0.7,
+                            ),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.close_rounded,
+                          size: 11,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -1641,7 +1763,7 @@ Future<T?> _showPopup<T>({
   required List<_PopupItem<T>> items,
 }) {
   final theme = Theme.of(context);
-  final appColors = context.appColors;
+  final isDark = theme.brightness == Brightness.dark;
   final completer = Completer<T?>();
 
   late OverlayEntry overlayEntry;
@@ -1661,54 +1783,77 @@ Future<T?> _showPopup<T>({
           Positioned(
             left: left,
             top: top,
-            child: Material(
-              elevation: 8,
-              borderRadius: BorderRadius.circular(8),
-              color: appColors.chipBg,
-              child: Container(
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(
+                sigmaX: GlassTokens.blurMedium,
+                sigmaY: GlassTokens.blurMedium,
+                tileMode: TileMode.mirror,
+              ),
+              child: GlassContainer(
+                radius: 16,
+                frost: false,
                 width: width,
-                constraints: const BoxConstraints(maxHeight: 240),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: theme.dividerColor.withValues(alpha: 0.25),
-                    width: 0.5,
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                shadows: [
+                  BoxShadow(
+                    color: isDark
+                        ? Colors.black.withValues(alpha: 0.5)
+                        : const Color(0x29223B6E),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                    spreadRadius: -6,
                   ),
-                ),
-                child: ListView(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  children: items.map((item) {
-                    return InkWell(
-                      onTap: item.enabled
-                          ? () {
-                              overlayEntry.remove();
-                              if (!completer.isCompleted) {
-                                completer.complete(item.value);
+                ],
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 240),
+                  child: ListView(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    children: items.map((item) {
+                      final selected = item.selected;
+                      return InkWell(
+                        onTap: item.enabled
+                            ? () {
+                                overlayEntry.remove();
+                                if (!completer.isCompleted) {
+                                  completer.complete(item.value);
+                                }
                               }
-                            }
-                          : null,
-                      child: Container(
-                        height: item.height,
-                        padding: item.padding,
-                        alignment: Alignment.center,
-                        child: Text(
-                          item.label,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: item.fontSize,
-                            fontWeight: item.selected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
-                            color: item.enabled
-                                ? null
-                                : theme.disabledColor.withValues(alpha: 0.4),
+                            : null,
+                        child: Container(
+                          height: item.height,
+                          padding: item.padding,
+                          alignment: Alignment.center,
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 1,
                           ),
-                          textAlign: item.textAlign,
-                          overflow: TextOverflow.ellipsis,
+                          decoration: selected
+                              ? BoxDecoration(
+                                  color: theme.colorScheme.primary.withValues(
+                                    alpha: isDark ? 0.28 : 0.12,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                )
+                              : null,
+                          child: Text(
+                            item.label,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontSize: item.fontSize,
+                              fontWeight: item.selected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color: item.enabled
+                                  ? null
+                                  : theme.disabledColor.withValues(alpha: 0.4),
+                            ),
+                            textAlign: item.textAlign,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
             ),

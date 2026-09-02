@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../utils/translations.dart';
 import '../../../../api/models/message.dart';
+import 'tool_glass_card.dart';
 
 class GlobCard extends StatelessWidget {
   final Part part;
@@ -25,41 +27,38 @@ class GlobCard extends StatelessWidget {
     final suffix = fileCount > 0 ? '$fileCount files' : '';
     final isError = status == ToolStateStatus.error;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+    return ToolGlassCard(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      leading: ToolIconCapsule(
+        icon: isError
+            ? CupertinoIcons.exclamationmark_triangle_fill
+            : CupertinoIcons.folder_fill,
+        color: isError ? theme.colorScheme.error : theme.colorScheme.primary,
+      ),
       child: Row(
         children: [
-          Text(
-            LocaleKeys.cardVisGlob.tr,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: isError
-                  ? theme.colorScheme.error.withValues(alpha: 0.7)
-                  : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-            ),
-          ),
-          const SizedBox(width: 6),
           Flexible(
             child: Text(
               label,
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 13,
-                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                fontWeight: FontWeight.w500,
+                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.75),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
           if (suffix.isNotEmpty) ...[
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             Text(
               suffix,
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 11.5,
-                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.4),
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.primary.withValues(alpha: 0.75),
               ),
             ),
           ],

@@ -458,8 +458,13 @@ class _MarkdownCodeBlockState extends State<_MarkdownCodeBlock> {
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0D1117) : const Color(0xFFF6F8FA),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.12)
+              : Colors.white.withValues(alpha: 0.9),
+          width: 0.8,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -471,7 +476,7 @@ class _MarkdownCodeBlockState extends State<_MarkdownCodeBlock> {
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF16171E) : const Color(0xFFE5E7EB),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(7),
+                top: Radius.circular(13.2),
               ),
             ),
             child: Row(
@@ -520,7 +525,7 @@ class _MarkdownCodeBlockState extends State<_MarkdownCodeBlock> {
                           _copied ? Icons.check : Icons.copy_outlined,
                           size: 11,
                           color: _copied
-                              ? Colors.green
+                              ? const Color(0xFF30D158)
                               : theme.textTheme.bodySmall?.color?.withValues(
                                   alpha: 0.5,
                                 ),

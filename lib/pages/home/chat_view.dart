@@ -468,11 +468,13 @@ class _ChatErrorCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: cs.errorContainer,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: appColors.errorOutline, width: 1),
+        color: cs.errorContainer.withValues(
+          alpha: theme.brightness == Brightness.dark ? 0.55 : 0.8,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: appColors.errorOutline, width: 0.8),
       ),
       child: SelectableText(
         error,

@@ -104,10 +104,10 @@ class _MessageDiffCardState extends State<MessageDiffCard> {
           ),
           const SizedBox(width: 6),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1.5),
             decoration: BoxDecoration(
               color: theme.colorScheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(100),
             ),
             child: Text(
               '${diffs.length}',
@@ -122,20 +122,24 @@ class _MessageDiffCardState extends State<MessageDiffCard> {
           if (totalAdd > 0)
             Text(
               '+$totalAdd',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF4CAF50),
+                fontWeight: FontWeight.w700,
+                color: theme.brightness == Brightness.dark
+                    ? const Color(0xFF66E39B)
+                    : const Color(0xFF1F8A4C),
               ),
             ),
           if (totalAdd > 0 && totalDel > 0) const SizedBox(width: 6),
           if (totalDel > 0)
             Text(
               '-$totalDel',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFFE57373),
+                fontWeight: FontWeight.w700,
+                color: theme.brightness == Brightness.dark
+                    ? const Color(0xFFFF7A70)
+                    : const Color(0xFFE5484D),
               ),
             ),
           const SizedBox(width: 6),
@@ -149,7 +153,7 @@ class _MessageDiffCardState extends State<MessageDiffCard> {
     );
 
     final fileList = Padding(
-      padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
       child: isTablet
           // 高亮取本卡片本地 _selected，各卡片/列表互不影响。
           ? Column(
@@ -168,10 +172,15 @@ class _MessageDiffCardState extends State<MessageDiffCard> {
     return Container(
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1F29) : const Color(0xFFF6F7F9),
-        borderRadius: BorderRadius.circular(10),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.07)
+            : Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: theme.dividerColor.withValues(alpha: isDark ? 0.15 : 0.3),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.16)
+              : Colors.white.withValues(alpha: 0.9),
+          width: 0.8,
         ),
       ),
       clipBehavior: Clip.antiAlias,

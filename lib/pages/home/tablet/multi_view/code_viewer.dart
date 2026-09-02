@@ -712,7 +712,7 @@ class _FileEditorPageState extends State<FileEditorPage> {
                   fontSize: _fontSize,
                   fontFamily: 'monospace',
                   textColor: theme.colorScheme.onSurface,
-                  backgroundColor: theme.scaffoldBackgroundColor,
+                  backgroundColor: theme.colorScheme.surface,
                   codeTheme: langMode != null
                       ? CodeHighlightTheme(
                           languages: {

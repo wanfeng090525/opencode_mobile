@@ -7,6 +7,7 @@ import '../../../../utils/app_theme.dart';
 import '../../../../widgets/detail_bottom_sheet.dart';
 import '../../tablet/diff_code_view.dart';
 import '../../tablet/diff_view.dart';
+import 'tool_glass_card.dart';
 
 /// E2：`_collectEntries` 与 header 统计的按 part 实例 memo（Part 不可变、
 /// 更新即整体换实例）。Expando 随 part 回收，无需淘汰。
@@ -117,11 +118,15 @@ class _EditCardState extends State<EditCard> {
     final isDark = theme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: appColors.toolCardBg,
-        borderRadius: BorderRadius.circular(8),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.07)
+            : Colors.white.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.dividerColor.withValues(alpha: isDark ? 0.2 : 0.4),
-          width: 0.5,
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.16)
+              : Colors.white.withValues(alpha: 0.9),
+          width: 0.8,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -130,7 +135,7 @@ class _EditCardState extends State<EditCard> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             color: theme.dividerColor.withValues(alpha: isDark ? 0.1 : 0.05),
             child: Row(
               children: [
@@ -224,108 +229,95 @@ class _EditCardState extends State<EditCard> {
     );
     final canExpand = hasContent && !isRunning;
 
-    return Container(
-      margin: const EdgeInsets.only(left: 0, right: 0, top: 2, bottom: 2),
-      decoration: BoxDecoration(
-        color: appColors.toolCardBg,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: theme.dividerColor.withValues(alpha: 0.2),
-          width: 0.5,
-        ),
+    return ToolGlassCard(
+      onTap: canExpand ? _openSheet : null,
+      leading: ToolIconCapsule(
+        icon: isError
+            ? CupertinoIcons.exclamationmark_triangle_fill
+            : CupertinoIcons.pencil,
+        color: isError
+            ? theme.colorScheme.error
+            : (isPureWrite
+                  ? theme.colorScheme.primary
+                  : const Color(0xFF64D2FF)),
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: canExpand ? _openSheet : null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 38,
-                  child: Text(
-                    headerLabel,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: isError
-                          ? theme.colorScheme.error.withValues(alpha: 0.7)
-                          : theme.textTheme.bodySmall?.color?.withValues(
-                              alpha: 0.6,
-                            ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                if (headerPath.isNotEmpty)
-                  Expanded(
-                    child: Text(
-                      headerPath,
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 13,
-                        color: theme.textTheme.bodySmall?.color,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  )
-                else
-                  Expanded(
-                    child: Text(
-                      '...',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontSize: 13,
-                        color: theme.hintColor,
-                      ),
-                    ),
-                  ),
-                if (!isPureWrite && (addedLines > 0 || removedLines > 0)) ...[
-                  const SizedBox(width: 8),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '+$addedLines',
-                          style: TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 11.5,
-                            color: appColors.success,
-                          ),
-                        ),
-                        const TextSpan(
-                          text: ' ',
-                          style: TextStyle(fontSize: 11.5),
-                        ),
-                        TextSpan(
-                          text: '-$removedLines',
-                          style: TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 11.5,
-                            color: theme.colorScheme.error,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                if (canExpand) ...[
-                  const SizedBox(width: 6),
-                  Icon(
-                    CupertinoIcons.chevron_right,
-                    size: 12,
-                    color: theme.textTheme.bodySmall?.color?.withValues(
-                      alpha: 0.35,
-                    ),
-                  ),
-                ],
-              ],
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            headerLabel,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isError
+                  ? theme.colorScheme.error.withValues(alpha: 0.7)
+                  : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
             ),
           ),
-        ),
+          const SizedBox(width: 8),
+          if (headerPath.isNotEmpty)
+            Expanded(
+              child: Text(
+                headerPath,
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 13,
+                  color: theme.textTheme.bodySmall?.color,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            )
+          else
+            Expanded(
+              child: Text(
+                '...',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontSize: 13,
+                  color: theme.hintColor,
+                ),
+              ),
+            ),
+          if (!isPureWrite && (addedLines > 0 || removedLines > 0)) ...[
+            const SizedBox(width: 8),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '+$addedLines',
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: appColors.success,
+                    ),
+                  ),
+                  const TextSpan(
+                    text: ' ',
+                    style: TextStyle(fontSize: 11.5),
+                  ),
+                  TextSpan(
+                    text: '-$removedLines',
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
+      trailing: canExpand
+          ? Icon(
+              CupertinoIcons.chevron_right,
+              size: 12,
+              color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.35),
+            )
+          : null,
     );
   }
 }

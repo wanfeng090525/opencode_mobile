@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../../api/models/message.dart';
+import 'tool_glass_card.dart';
 
 class TaskCard extends StatelessWidget {
   final Part part;
@@ -25,39 +27,41 @@ class TaskCard extends StatelessWidget {
     final status = part.toolStatus;
     final isError = status == ToolStateStatus.error;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
+    return ToolGlassCard(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      leading: ToolIconCapsule(
+        icon: isError
+            ? CupertinoIcons.exclamationmark_triangle_fill
+            : CupertinoIcons.bolt_fill,
+        color: isError ? theme.colorScheme.error : theme.colorScheme.primary,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           if (description.toString().isNotEmpty)
-            Flexible(
-              child: Text(
-                description.toString(),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: isError
-                      ? theme.colorScheme.error.withValues(alpha: 0.7)
-                      : null,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            Text(
+              description.toString(),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isError
+                    ? theme.colorScheme.error.withValues(alpha: 0.7)
+                    : null,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          if (isError && part.toolError.isNotEmpty) ...[
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                part.toolError,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  color: theme.colorScheme.error.withValues(alpha: 0.6),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+          if (isError && part.toolError.isNotEmpty)
+            Text(
+              part.toolError,
+              style: TextStyle(
+                fontSize: 11.5,
+                color: theme.colorScheme.error.withValues(alpha: 0.6),
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
         ],
       ),
     );
