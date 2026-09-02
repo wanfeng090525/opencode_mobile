@@ -49,9 +49,18 @@ jobs:
           key: cargo-${{ runner.os }}-${{ hashFiles('rust/Cargo.lock') }}
           restore-keys: cargo-${{ runner.os }}-
 
-      # Flutter 3.47.2 默认 NDK；预装可避免 Gradle 在构建中途自行下载
+      # Flutter 3.47.2 默认 NDK；预装可避免 Gradle 在构建中途自行下载。
+      # 注意：ubuntu-latest 的 sdkmanager 不在 PATH，需使用完整路径。
       - name: Install Android NDK
-        run: sdkmanager --install "ndk;28.2.13676358" > /dev/null
+        run: |
+          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          if [ -x "$SDKMANAGER" ]; then
+            yes | "$SDKMANAGER" --install "ndk;28.2.13676358" > /dev/null 2>&1 || true
+            echo "已安装/确认 NDK:"
+            ls "$ANDROID_HOME/ndk" || true
+          else
+            echo "sdkmanager 不可用，构建时由 AGP 自动安装 NDK"
+          fi
 
       - name: Toolchain info
         run: |
