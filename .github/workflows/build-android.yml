@@ -1,0 +1,82 @@
+name: Android CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    name: Build arm64-v8a Release APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.2
+          cache: true
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: cargo-${{ runner.os }}-${{ hashFiles('rust/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+
+      # Flutter 3.47.2 默认 NDK；预装可避免 Gradle 在构建中途自行下载
+      - name: Install Android NDK
+        run: sdkmanager --install "ndk;28.2.13676358" > /dev/null
+
+      - name: Toolchain info
+        run: |
+          flutter --version
+          rustc -V
+          cargo -V
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      # abiFilters(arm64-v8a) + 单目标平台：Rust(cargokit) 与 libapp.so 均只构建 arm64
+      - name: Build release APK (arm64-v8a only)
+        run: flutter build apk --release --target-platform android-arm64
+
+      - name: Collect APK
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk \
+            "dist/opencode-mobile-arm64-v8a-release.apk"
+          ls -lh dist/
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencode-mobile-arm64-v8a-release
+          path: dist/*.apk
+          if-no-files-found: error
+          compression-level: 0

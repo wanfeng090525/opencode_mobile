@@ -59,7 +59,13 @@ android {
             applicationIdSuffix = ".debug"
         }
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // 未提供 key.properties（CI 或本地无签名密钥）时回退 debug 签名，
+            // 保证始终能产出可直接安装的 APK；提供正式密钥时自动走 release 签名。
+            signingConfig = if (keyPropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
